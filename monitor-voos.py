@@ -1,56 +1,40 @@
 import os
 import requests
 
-# Puxa a chave dos Segredos (Secrets) do GitHub Actions ou usa um valor padrão
-API_KEY = os.getenv("SERPAPI_KEY", "SUA_API_KEY_AQUI")
+# Suas listas de aeroportos
+origens = ["GRU", "VCP", "CGH"]
+destinos = ["REC", "SSA","NAT"] 
 
-# Configurações da Busca
-ORIGEM = "GRU"
-DESTINO = "REC"
-DATA_IDA = "2026-12-31"
-DATA_VOLTA = "2027-01-08"
-PRECO_MAXIMO = 10000
+# Configurações fixas
+PRECO_TETO = 2500
+API_KEY = os.getenv("SERPAPI_KEY")
 
-def buscar_voos():
-    url = "https://serpapi.com/search"
-    
-    params = {
-        "engine": "google_flights",
-        "departure_id": ORIGEM,
-        "arrival_id": DESTINO,
-        "outbound_date": DATA_IDA,
-        "return_date": DATA_VOLTA,
-        "currency": "BRL",
-        "hl": "pt-br",
-        "gl": "br",
-        "api_key": API_KEY
-    }
-    
-    try:
-        response = requests.get(url, params=params)
+# Loop para testar todas as combinações (GRU -> REC, GRU -> SSA, VCP -> REC...)
+for origem in origens:
+    for destino in destinos:
+        print(f"\n🔍 Pesquisando voos de {origem} para {destino}...")
+
+        params = {
+            "engine": "google_flights",
+            "departure_id": origem,
+            "arrival_id": destino,
+            "outbound_date": "2026-10-15",
+            "return_date": "2026-10-22",
+            "currency": "BRL",
+            "hl": "pt-br",
+            "gl": "br",
+            "api_key": API_KEY,
+        }
+
+        response = requests.get("https://serpapi.com/search", params=params)
         dados = response.json()
-        
+
+        # Verifica se retornou voos válidos
         if "best_flights" in dados:
-            voos = dados["best_flights"]
-            melhor_preco = voos[0]["price"]
-            
-            print(f"[{ORIGEM} -> {DESTINO}] Menor preço encontrado: R$ {melhor_preco}")
-            
-            if melhor_preco <= PRECO_MAXIMO:
-                enviar_alerta(melhor_preco, voos[0])
-            else:
-                print("Preço ainda está acima do teto desejado.")
+            menor_preco = dados["best_flights"][0]["price"]
+            print(f"[{origem} -> {destino}] Menor preço: R$ {menor_preco}")
+
+            if menor_preco <= PRECO_TETO:
+                print(f"🎉 PROMOÇÃO! {origem} -> {destino} por R$ {menor_preco}")
         else:
-            print("Nenhum voo encontrado ou erro na resposta da API.")
-            print("Resposta da API:", dados)
-            
-    except Exception as e:
-        print(f"Erro ao consultar a API: {e}")
-
-def enviar_alerta(preco, detalhes):
-    print("\n" + "!"*40)
-    print(f"🎉 PROMOÇÃO ENCONTRADA! Voo por R$ {preco}")
-    print("!"*40 + "\n")
-
-if __name__ == "__main__":
-    buscar_voos()
+            print(f"Nenhum voo encontrado para {origem} -> {destino}.")
