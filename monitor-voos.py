@@ -5,7 +5,7 @@ import requests
 API_KEY = os.getenv("SERPAPI_KEY", "SUA_API_KEY_AQUI")
 
 # Configurações da Busca
-ORIGEM = "SAO"
+ORIGEM = "GRU"
 DESTINO = "REC"
 DATA_IDA = "2026-12-31"
 DATA_VOLTA = "2027-01-08"
