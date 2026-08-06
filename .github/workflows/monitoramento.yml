@@ -31,4 +31,4 @@ jobs:
         env:
           # Associa a Secret que você criou à variável que o script lê
           SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
-        run: python monitor-voo.py
+        run: python monitor-voos.py
