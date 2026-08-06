@@ -9,7 +9,7 @@ ORIGEM = "SAO"
 DESTINO = "REC"
 DATA_IDA = "2026-12-31"
 DATA_VOLTA = "2027-01-08"
-PRECO_MAXIMO = 3500
+PRECO_MAXIMO = 10000
 
 def buscar_voos():
     url = "https://serpapi.com/search"
@@ -22,6 +22,7 @@ def buscar_voos():
         "return_date": DATA_VOLTA,
         "currency": "BRL",
         "hl": "pt-br",
+        "gl": "br",
         "api_key": API_KEY
     }
     
